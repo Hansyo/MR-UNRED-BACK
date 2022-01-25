@@ -19,4 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('Reservee', ReserveController::class);
+Route::resource('Reserve', ReserveController::class);
