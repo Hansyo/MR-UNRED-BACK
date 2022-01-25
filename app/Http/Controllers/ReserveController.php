@@ -26,7 +26,7 @@ class ReserveController extends Controller
     public function store(Request $request)
     {
         $reserve = new Reserve();
-        Reserve::create($request->pnly(['guest_num', 'start_date_time', 'end_data_time', 'purpose', 'mail_addr', 'phone_number', 'guest_num', 'room_id']));
+        Reserve::create($request->only(['guest_num', 'start_date_time', 'end_data_time', 'purpose', 'mail_addr', 'phone_number', 'guest_num', 'room_id']));
         $reserve->save();
         //
     }
