@@ -19,9 +19,7 @@ class CreateReserveTables extends Migration
             $table->dateTime("start_date_time");
             $table->dateTime("end_date_time");
             $table->longText("purpose");
-            $table->text('mail_addr');
-            $table->text('phone_num');
-            $table->integer('guest_num')->unsigned()->nullable();
+            $table->longText("guest_detail");
             $table->integer('room_id')->unsigned();
             $table->timestamps();
         });
