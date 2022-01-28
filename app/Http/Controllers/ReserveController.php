@@ -62,6 +62,16 @@ class ReserveController extends Controller
      */
     public function destroy($id)
     {
+        $result = Reserve::where('id', $id)->delete();
+        if ($result) {
+            return response()->json([
+                'message' => 'Reserve deleted successfully',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'ID not found',
+            ], 404);
+        }
         //
     }
 }
