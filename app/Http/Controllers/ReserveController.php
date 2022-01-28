@@ -25,10 +25,8 @@ class ReserveController extends Controller
      */
     public function store(Request $request)
     {
-        $reserve = new Reserve();
-        Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'mail_addr', 'phone_num', 'guest_num', 'room_id']));
-        $reserve->save();
-        //
+        // これで作成後にJSONを返してくれる。
+        return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
     }
 
     /**
