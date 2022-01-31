@@ -37,16 +37,6 @@ class ReserveController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        $validator = $request->validate([
-            'start_date_time' => 'bail|required|date',
-            #'start_date_time' => ['bail', 'required', 'date', 'regex:/^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/'],
-            'end_date_time' => 'bail|required|date',
-            #'end_date_time' => ['bail', 'required', 'date', 'regex:/^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/'],
-            'room_id' => 'required | min:1 | max:6',
-        ]);
-        */
-
         // これで作成後にJSONを返してくれる。
         return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
     }
