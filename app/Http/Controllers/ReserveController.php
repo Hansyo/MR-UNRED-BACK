@@ -37,6 +37,14 @@ class ReserveController extends Controller
      */
     public function show($id)
     {
+        $result = Reserve::find($id);
+        if ($result) {
+            return $result;
+        } else {
+            return response()->json([
+                'message' => 'ID not found',
+            ], 404);
+        }
         //
     }
 
