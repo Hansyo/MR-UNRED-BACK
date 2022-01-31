@@ -30,7 +30,7 @@ class StoreReserveRequest extends FormRequest
             'end_date_time'   => ['bail', 'required', 'date', 'regex:/^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/', 'after:start_date_time'],
             'purpose'         => ['required', 'string',],
             'guest_detail'    => ['required', 'string',],
-            'room_id'         => ['required', 'min:1', 'max:6'],
+            'room_id'         => ['required', 'integer', 'min:1', 'max:6'],
         ];
     }
 }
