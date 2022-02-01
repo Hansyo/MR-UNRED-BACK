@@ -14,4 +14,17 @@ class Reserve extends Model
         'start_date_time',
         'end_date_time',
     ];
+
+    public function scopeWhereHasReservation($query, $start, $end){
+
+        $query->where(function($q) use($start, $end) {
+            $q->where('start_date_time', '>=', $start)->where('start_date_time', '<', $end);
+        })
+        ->orWhere(function($q) use($start, $end){
+            $q->where('end_date_time', '>', $start)->where('end_date_time', '<=', $end);
+        })
+        ->orWhere(function($q) use ($start, $end){
+            $q->where('start_date_time', '<', $start)->where('end_date_time', '>', $end);
+        });
+    }
 }

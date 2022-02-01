@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reserve;
+use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
 
 class ReserveController extends Controller
@@ -13,8 +14,19 @@ class ReserveController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(GetIndexReserveRequest $request)
     {
+        $start_at = $request->query('start_date_time');
+        $end_at = $request->query('end_date_time');
+        #$room_id = $request->query('room_id');
+
+        return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
+            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
+        }, function() use($start_at, $end_at){
+            return Reserve::whereHasReservation($start_at, $end_at)->get();
+        });
+        
+        #return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
         //
     }
 
