@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
+use App\Http\Requests\StoreReserveRequest;
 
 class ReserveController extends Controller
 {
@@ -32,10 +33,10 @@ class ReserveController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\StoreReserveRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreReserveRequest $request)
     {
         // これで作成後にJSONを返してくれる。
         return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
