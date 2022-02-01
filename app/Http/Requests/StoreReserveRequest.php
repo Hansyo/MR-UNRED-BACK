@@ -25,11 +25,11 @@ class StoreReserveRequest extends FormRequest
     public function rules()
     {
         return [
-            'guest_name'      => ['required', 'string',],
+            'guest_name'      => ['string',],
             'start_date_time' => ['bail', 'required', 'date_format:Y-m-d\TH:i:s.ve', 'before:end_date_time'],
             'end_date_time'   => ['bail', 'required', 'date_format:Y-m-d\TH:i:s.ve', 'after:start_date_time'],
             'purpose'         => ['required', 'string',],
-            'guest_detail'    => ['required', 'string',],
+            'guest_detail'    => ['string',],
             'room_id'         => ['required', 'integer', 'between:1,6'],
         ];
     }
