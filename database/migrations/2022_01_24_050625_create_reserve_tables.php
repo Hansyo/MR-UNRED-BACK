@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Models\Repitation;
+
 class CreateReserveTables extends Migration
 {
     /**
@@ -21,6 +23,7 @@ class CreateReserveTables extends Migration
             $table->longText("purpose");
             $table->longText("guest_detail");
             $table->integer('room_id')->unsigned();
+            $table->foreignIdFor(Repitation::class)->nullable();
             $table->timestamps();
         });
     }
