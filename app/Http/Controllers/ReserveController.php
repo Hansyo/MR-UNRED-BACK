@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
+use Illuminate\Support\Facades\DB;
 
 class ReserveController extends Controller
 {
@@ -18,7 +19,7 @@ class ReserveController extends Controller
     {
         $start_at = $request->query('start_date_time');
         $end_at = $request->query('end_date_time');
-        #$room_id = $request->query('room_id');
+        //$room_id = $request->query('room_id');
 
         return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
             return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
@@ -26,7 +27,7 @@ class ReserveController extends Controller
             return Reserve::whereHasReservation($start_at, $end_at)->get();
         });
         
-        #return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
+        //return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
         //
     }
 
@@ -38,8 +39,28 @@ class ReserveController extends Controller
      */
     public function store(StoreReserveRequest $request)
     {
+        //トランザクション
+        DB::begintransaction();
+        try{
+            $result = Reserve::where('room_id', '=', $request->room_id)
+            ->whereHasReservation($request->start_date_time, $request->end_date_time)->get();
+            Logger("result", ["result"=>$result->isEmpty(), "result"=>$result]);
+            if ($result->isNotEmpty()) {
+                return response()->json([
+                    'message' => 'Reservation is butting',
+                    'bookings' => $result
+                ], 409);
+            }
+
+            Reserve::create($request->
+            only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+            DB::commit();
+        } catch (Exception $e){
+            DB::rollback();
+            throw $e;
+        }
         // これで作成後にJSONを返してくれる。
-        return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+        #return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
     }
 
     /**
