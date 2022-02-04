@@ -63,7 +63,7 @@ class StoreReserveRequest extends FormRequest
             'room_id'         => ['required', 'integer', 'between:1,6'],
             'repitation.type' => ['required', new EnumValue(RepitationType::class), $repitation_duration, $repitation_method],
             'repitation.num'  => ['integer', 'min:1', 'required_without:repitation.finish_at', ],
-            'repitation.finish_at' => ['date_format:Y-m-d\TH:i:s.ve', 'required_without:repitation.num', $repitation_finish_date],
+            'repitation.finish_at' => ['date_format:Y-m-d', 'required_without:repitation.num', $repitation_finish_date],
         ];
     }
 }
