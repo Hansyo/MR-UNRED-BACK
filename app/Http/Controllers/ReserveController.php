@@ -62,15 +62,9 @@ class ReserveController extends Controller
 
             switch ($request->input('repitation.type')) {
                 case RepitationType::NOTHING: // 繰り返しなし
-                    $result = Reserve::where('room_id', '=', $request->room_id)
-                        ->whereHasReservation($request->start_date_time, $request->end_date_time)->get();
-                    if ($result->isNotEmpty()) {
-                        return response()->json([
-                            'message' => 'Reservation is conflicting',
-                            'conflictings' => $result,
-                        ], 409);
-                    }
-                    return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+                    $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $end_at)->get();
+                    if ($bookings->isEmpty()) // 空のときに作成してリターンするようにした。
+                        return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
                     break;
 
                 case RepitationType::DAILY: // 毎日
