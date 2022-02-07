@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Repitation;
 use App\Enums\RepitationType;
@@ -23,15 +24,15 @@ class ReserveController extends Controller
     {
         $start_at = $request->query('start_date_time');
         $end_at = $request->query('end_date_time');
-        #$room_id = $request->query('room_id');
+        //$room_id = $request->query('room_id');
 
         return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
             return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
         }, function() use($start_at, $end_at){
             return Reserve::whereHasReservation($start_at, $end_at)->get();
         });
-        
-        #return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
+
+        //return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
         //
     }
 
@@ -43,14 +44,6 @@ class ReserveController extends Controller
      */
     public function store(StoreReserveRequest $request)
     {
-        $start_at = $request->input('start_date_time');
-        $end_at = $request->input('end_date_time');
-        $room_id = $request->input('room_id');
-        $s_at_c = new Carbon($start_at);
-        $e_at_c = new Carbon($end_at);
-        $days = collect();
-        $bookings = collect();
-
         /*
         1. 登録可能か検査する。
         2. 登録可能な場合、repitationを作る。
@@ -58,47 +51,66 @@ class ReserveController extends Controller
             2. 配列を返す
         3. 登録不可能な場合、かぶった予定を返す。
         */
-        switch ($request->input('repitation.type')) {
-            case RepitationType::NOTHING:
-                return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
-                break;
+        $result = DB::transaction(function () use ($request) {
+            $start_at = $request->input('start_date_time');
+            $end_at = $request->input('end_date_time');
+            $room_id = $request->input('room_id');
+            $s_at_c = new Carbon($start_at);
+            $e_at_c = new Carbon($end_at);
+            $days = collect();
+            $bookings = collect();
 
-            case RepitationType::DAILY:
-                $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addDay($request->input('repitation.num')) )->endOfDay();
-                // 予定を登録する日を予め計算しておく。
-                while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
-                    $days->push([$s_at_c->toISOString(), $e_at_c->toISOString()]);
-                    $s_at_c->addDay(1);    $e_at_c->addDay(1);
-                }
-                // 衝突確認
-                $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->get();
-                break;
+            switch ($request->input('repitation.type')) {
+                case RepitationType::NOTHING: // 繰り返しなし
+                    $result = Reserve::where('room_id', '=', $request->room_id)
+                        ->whereHasReservation($request->start_date_time, $request->end_date_time)->get();
+                    if ($result->isNotEmpty()) {
+                        return response()->json([
+                            'message' => 'Reservation is conflicting',
+                            'conflictings' => $result,
+                        ], 409);
+                    }
+                    return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+                    break;
 
-            case RepitationType::WEEKLY:
-                $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addWeek($request->input('repitation.num')) )->endOfDay();
-                Logger("f_at_c", ["f_at_c" => $f_at_c]);
-                // 予定を登録する日を予め計算しておく。
-                while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
-                    $days->push([$s_at_c->toISOString(), $e_at_c->toISOString()]);
-                    $s_at_c->addWeek(1);    $e_at_c->addWeek(1);
-                }
-                // 衝突確認
-                $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->dayOfWeeks($start_at, $end_at)->whereHasReservation($start_at, $end_at)->get();
-                break;
-        }
+                case RepitationType::DAILY: // 毎日
+                    $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addDay($request->input('repitation.num')))->endOfDay();
+                    // 予定を登録する日を予め計算しておく。
+                    while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
+                        $days->push([$s_at_c->toISOString(), $e_at_c->toISOString()]);
+                        $s_at_c->addDay(1);
+                        $e_at_c->addDay(1);
+                    }
+                    // 衝突確認
+                    $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->get();
+                    break;
 
-        if ($bookings->isNotEmpty()) { // Booking
-            return response()->json([
-                "message" => "Reserves are booking.",
-                "bookings" => $bookings,
-            ], 409);
-        } else { // Not Booking
-            $guest_name = $request->input('guest_name');
-            $purpose = $request->input('purpose');
-            $guest_detail = $request->input('guest_detail');
-    
-            $repitation = Repitation::create();
-            $days->eachSpread(function ($start, $end) use ($guest_name, $purpose, $guest_detail, $room_id, $repitation,) {
+                case RepitationType::WEEKLY: // 毎週
+                    $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addWeek($request->input('repitation.num')))->endOfDay();
+                    Logger("f_at_c", ["f_at_c" => $f_at_c]);
+                    // 予定を登録する日を予め計算しておく。
+                    while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
+                        $days->push([$s_at_c->toISOString(), $e_at_c->toISOString()]);
+                        $s_at_c->addWeek(1);
+                        $e_at_c->addWeek(1);
+                    }
+                    // 衝突確認
+                    $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->dayOfWeeks($start_at, $end_at)->whereHasReservation($start_at, $end_at)->get();
+                    break;
+            }
+
+            if ($bookings->isNotEmpty()) { // Conflicting.
+                return response()->json([
+                    'message' => 'Reservation is conflicting',
+                    'conflictings' => $bookings,
+                ], 409);
+            } else { // Not Conflicting.
+                $guest_name = $request->input('guest_name');
+                $purpose = $request->input('purpose');
+                $guest_detail = $request->input('guest_detail');
+
+                $repitation = Repitation::create();
+                $days->eachSpread(function ($start, $end) use ($guest_name, $purpose, $guest_detail, $room_id, $repitation,) {
                     $repitation->reserves()->create([
                         'guest_name' => $guest_name,
                         'start_date_time' => $start,
@@ -107,9 +119,11 @@ class ReserveController extends Controller
                         'guest_detail' => $guest_detail,
                         'room_id' => $room_id,
                     ]);
-            });
-            return $repitation->reserves()->get();
-        }
+                });
+                return $repitation->reserves()->get();
+            }
+        });
+        return $result;
     }
 
     /**
