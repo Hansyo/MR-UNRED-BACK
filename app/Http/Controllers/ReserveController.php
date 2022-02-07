@@ -22,7 +22,7 @@ class ReserveController extends Controller
         //$room_id = $request->query('room_id');
 
         return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
-            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->first();
+            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
         }, function() use($start_at, $end_at){
             return Reserve::whereHasReservation($start_at, $end_at)->get();
         });
