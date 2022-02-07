@@ -22,7 +22,7 @@ class ReserveController extends Controller
         //$room_id = $request->query('room_id');
 
         return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
-            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
+            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->first();
         }, function() use($start_at, $end_at){
             return Reserve::whereHasReservation($start_at, $end_at)->get();
         });
@@ -39,28 +39,18 @@ class ReserveController extends Controller
      */
     public function store(StoreReserveRequest $request)
     {
-        //トランザクション
-        DB::begintransaction();
-        try{
+        $result = DB::transaction(function () use ($request) {
             $result = Reserve::where('room_id', '=', $request->room_id)
-            ->whereHasReservation($request->start_date_time, $request->end_date_time)->get();
-            Logger("result", ["result"=>$result->isEmpty(), "result"=>$result]);
+                ->whereHasReservation($request->start_date_time, $request->end_date_time)->get();
             if ($result->isNotEmpty()) {
                 return response()->json([
-                    'message' => 'Reservation is butting',
-                    'bookings' => $result
+                    'message' => 'Reservation is conflicting',
+                    'conflictings' => $result
                 ], 409);
             }
-
-            Reserve::create($request->
-            only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
-            DB::commit();
-        } catch (Exception $e){
-            DB::rollback();
-            throw $e;
-        }
-        // これで作成後にJSONを返してくれる。
-        #return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+            return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
+        });
+        return $result;
     }
 
     /**
