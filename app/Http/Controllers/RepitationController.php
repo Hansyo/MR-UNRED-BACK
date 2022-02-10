@@ -43,7 +43,7 @@ class RepitationController extends Controller
     {
         $repitations = Repitation::find($id);
         if($repitations != null) {
-            return $repitations->get();
+            return $repitations->reserves()->get();
         } else {
             return response()->json(["message" => "Page not found.",], 404);
         }
