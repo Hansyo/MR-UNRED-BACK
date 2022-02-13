@@ -45,7 +45,7 @@ class RepitationController extends Controller
         if($repitations != null) {
             return $repitations->reserves()->get();
         } else {
-            return response()->json(["message" => "Page not found.",], 404);
+            return response()->json(["message" => "ID not found.",], 404);
         }
     }
 
