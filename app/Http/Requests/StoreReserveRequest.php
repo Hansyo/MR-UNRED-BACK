@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 use App\Enums\RepitationType;
-use BenSampo\Enum\Rules\EnumValue;
 use Carbon\Carbon;
 
 class StoreReserveRequest extends FormRequest
@@ -61,9 +60,9 @@ class StoreReserveRequest extends FormRequest
             'purpose'         => ['required', 'string',],
             'guest_detail'    => ['string',],
             'room_id'         => ['required', 'integer', 'between:1,6'],
-            'repitation.type' => ['required', new EnumValue(RepitationType::class), $repitation_duration, $repitation_method],
             'repitation.num'  => ['integer', 'min:1', 'required_without:repitation.finish_at', ],
             'repitation.finish_at' => ['date_format:Y-m-d', 'required_without:repitation.num', $repitation_finish_date],
+            'repitation.type' => ['required', 'between:0,2', $repitation_duration, $repitation_method],
         ];
     }
 }

@@ -9,7 +9,6 @@ use App\Http\Requests\StoreReserveRequest;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Repitation;
-use App\Enums\RepitationType;
 use Carbon\Carbon;
 use Illuminate\Log\Logger;
 
@@ -61,13 +60,13 @@ class ReserveController extends Controller
             $bookings = collect();
 
             switch ($request->input('repitation.type')) {
-                case RepitationType::NOTHING: // 繰り返しなし
+                case 0: // 繰り返しなし
                     $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $end_at)->get();
                     if ($bookings->isEmpty()) // ダブりなしなら作成してreturn
                         return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
                     break;
 
-                case RepitationType::DAILY: // 毎日
+                case 1: // 毎日
                     $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addDay($request->input('repitation.num') - 1))->endOfDay();
                     /* JSTの0:00 ~ 9:00 までに終了時間が入った場合、追加で一日予約を取られてしまう。対抗策として、終了日を1日前倒しする。もっとスマートな方法があるかも。
                        週毎では、同様の問題が起こらない。なぜなら期間が1週間と長く、1日程度の差を吸収してしまうため。1週間先を指定されることは想定しない。 */
@@ -82,7 +81,7 @@ class ReserveController extends Controller
                     $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->get();
                     break;
 
-                case RepitationType::WEEKLY: // 毎週
+                case 2: // 毎週
                     $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addWeek($request->input('repitation.num') - 1))->endOfDay();
                     Logger("f_at_c", ["f_at_c" => $f_at_c]);
                     // 予定を登録する日を予め計算しておく。
