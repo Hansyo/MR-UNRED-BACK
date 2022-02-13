@@ -14,13 +14,13 @@ class CreateReserveTables extends Migration
     public function up()
     {
         Schema::create('reserves', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->text("guest_name");
             $table->dateTime("start_date_time");
             $table->dateTime("end_date_time");
             $table->longText("purpose");
             $table->longText("guest_detail");
-            $table->integer('room_id')->unsigned();
+            $table->unsignedInteger('room_id');
             $table->timestamps();
         });
     }
