@@ -33,18 +33,26 @@ class StoreReserveRequest extends FormRequest
             $start = new Carbon($this->input('start_date_time'));
             $end = new Carbon($this->input('end_date_time'));
             switch($this->input('repitation.type')) {
-                case RepitationType::DAILY:
+                case 1:
                     if (! $end->between($start, $start->copy()->addDay())) $fail('start_date_time and end_date_time must be scheduled within 24 hours.');
-                case RepitationType::WEEKLY:
+                case 2:
                     if (! $end->between($start, $start->copy()->addWeek())) $fail('start_date_time and end_date_time must be scheduled within a week.');
             }
         };
 
-        $repitation_method = function($attr, $val, $fail)
+        $repitation_method_both = function($attr, $val, $fail)
         {
-            if($this->input('repitation.type') != RepitationType::NOTHING) {
+            if($this->input('repitation.type') != 0) {
                 if ($this->has('repitation.num') && $this->has('repitation.finish_at'))
                 $fail('Only one of repitation.num and repitation.finish_at can be specified, not both.');
+            }
+        };
+
+        $repitation_method_nothing = function($attr, $val, $fail)
+        {
+            if($this->input('repitation.type') != 0) {
+                if ($this->missing('repitation.num') && $this->missing('repitation.finish_at'))
+                $fail('Either repitation.num or repitation.finish_at must be specified.');
             }
         };
 
@@ -60,9 +68,9 @@ class StoreReserveRequest extends FormRequest
             'purpose'         => ['required', 'string',],
             'guest_detail'    => ['string',],
             'room_id'         => ['required', 'integer', 'between:1,6'],
-            'repitation.num'  => ['integer', 'min:1', 'required_without:repitation.finish_at', ],
-            'repitation.finish_at' => ['date_format:Y-m-d', 'required_without:repitation.num', $repitation_finish_date],
-            'repitation.type' => ['required', 'between:0,2', $repitation_duration, $repitation_method],
+            'repitation.type' => ['required', 'between:0,2', $repitation_duration, $repitation_method_both, $repitation_method_nothing],
+            'repitation.num'  => ['integer', 'min:1', ],
+            'repitation.finish_at' => ['date_format:Y-m-d', $repitation_finish_date],
         ];
     }
 }

@@ -61,6 +61,7 @@ class ReserveController extends Controller
 
             switch ($request->input('repitation.type')) {
                 case 0: // 繰り返しなし
+                    Logger("NONE", ["NONE" => $request]);
                     $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $end_at)->get();
                     if ($bookings->isEmpty()) // ダブりなしなら作成してreturn
                         return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
@@ -106,7 +107,7 @@ class ReserveController extends Controller
                 $guest_detail = $request->input('guest_detail');
 
                 $repitation = Repitation::create();
-                $days->eachSpread(function ($start, $end) use ($guest_name, $purpose, $guest_detail, $room_id, $repitation,) {
+                $days->eachSpread(function ($start, $end) use ($guest_name, $purpose, $guest_detail, $room_id, $repitation) {
                     $repitation->reserves()->create([
                         'guest_name' => $guest_name,
                         'start_date_time' => $start,
