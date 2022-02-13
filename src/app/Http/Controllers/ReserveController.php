@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ReserveController extends Controller
@@ -19,16 +20,9 @@ class ReserveController extends Controller
     {
         $start_at = $request->query('start_date_time');
         $end_at = $request->query('end_date_time');
-        //$room_id = $request->query('room_id');
-
-        return $request->whenHas('room_id', function($room_id) use($start_at, $end_at){
-            return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
-        }, function() use($start_at, $end_at){
-            return Reserve::whereHasReservation($start_at, $end_at)->get();
-        });
-        
-        //return Reserve::whereHasReservation($start_at, $end_at)->where('room_id', '=', $room_id)->get();
-        //
+        $result = Reserve::whereHasReservation($start_at, $end_at);
+        if ($request->filled('room_id')) $result = $result->where('room_id', '=', $request->query('room_id'));
+        return $result->get();
     }
 
     /**
@@ -48,8 +42,15 @@ class ReserveController extends Controller
                     'conflictings' => $result
                 ], 409);
             }
-            return Reserve::create($request->only(['guest_name', 'start_date_time', 'end_date_time', 'purpose', 'guest_detail', 'room_id']));
-        });
+            return Reserve::create([
+                'guest_name' => $request->guest_name,
+                'start_date_time' => new Carbon($request->start_date_time),
+                'end_date_time' => new Carbon($request->end_date_time),
+                'purpose' => $request->purpose,
+                'guest_detail' => $request->guest_detail,
+                'room_id' => $request->room_id,
+        ]);
+    });
         return $result;
     }
 
