@@ -8,6 +8,7 @@ use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Log\Logger;
 
 class ReserveController extends Controller
 {
@@ -43,6 +44,8 @@ class ReserveController extends Controller
                 ], 409);
             }
             return Reserve::create([
+                'reserver_id' => $_ENV['uid'], // 本番環境では、$_SERVERを渡す必要がある可能性が高い
+                'reserver_name' => $_ENV['jaDisplayName'],
                 'guest_name' => $request->guest_name,
                 'start_date_time' => new Carbon($request->start_date_time),
                 'end_date_time' => new Carbon($request->end_date_time),

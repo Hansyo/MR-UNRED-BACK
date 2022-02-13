@@ -15,6 +15,8 @@ class CreateReserveTables extends Migration
     {
         Schema::create('reserves', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->text('reserver_id');
+            $table->text("reserver_name");
             $table->text("guest_name");
             $table->dateTime("start_date_time");
             $table->dateTime("end_date_time");
