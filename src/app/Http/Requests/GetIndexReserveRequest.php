@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class GetIndexReserveRequest extends FormRequest
 {
@@ -37,5 +39,9 @@ class GetIndexReserveRequest extends FormRequest
             'end_date_time'   => ['bail', 'required', $isValidDate, 'after:start_date_time'],
             'room_id'         => ['integer', 'between:1,6'],
         ];
+    }
+
+    protected function failedValidation(Validator $validator) {
+        throw new HttpResponseException(response()->json(["message" =>"The given data was invalid.", "errors" => $validator->errors()], 422));
     }
 }

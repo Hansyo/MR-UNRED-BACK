@@ -3,10 +3,11 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Monolog\Logger;
 
-use App\Enums\RepitationType;
 use Carbon\Carbon;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
 
 class StoreReserveRequest extends FormRequest
 {
@@ -77,9 +78,13 @@ class StoreReserveRequest extends FormRequest
             'purpose'         => ['required', 'string',],
             'guest_detail'    => ['string',],
             'room_id'         => ['required', 'integer', 'between:1,6'],
-            'repitation.type' => ['required', 'between:0,2', $repitation_duration, $repitation_method_both, $repitation_method_nothing],
+            'repitation.type' => ['required', 'integer', 'between:0,2', $repitation_duration, $repitation_method_both, $repitation_method_nothing],
             'repitation.num'  => ['integer', 'min:1', ],
             'repitation.finish_at' => ['date_format:Y-m-d', $repitation_finish_date],
         ];
+    }
+
+    protected function failedValidation(Validator $validator) {
+        throw new HttpResponseException(response()->json(["message" =>"The given data was invalid.", "errors" => $validator->errors()], 422));
     }
 }
