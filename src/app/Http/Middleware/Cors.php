@@ -16,7 +16,6 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
-        Logger("Middlware CORS", ["request" => $request]);
         return $next($request)
             ->header('Access-Control-Allow-Origin', env('CLIENT_BASE_URL', '*'))
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
