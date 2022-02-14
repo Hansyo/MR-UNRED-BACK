@@ -3,7 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Monolog\Logger;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreReserveRequest extends FormRequest
 {
@@ -42,5 +43,9 @@ class StoreReserveRequest extends FormRequest
             'guest_detail'    => ['string',],
             'room_id'         => ['required', 'integer', 'between:1,6'],
         ];
+    }
+
+    protected function failedValidation(Validator $validator) {
+        throw new HttpResponseException(response()->json(["message" =>"The given data was invalid.", "errors" => $validator->errors()], 422));
     }
 }
