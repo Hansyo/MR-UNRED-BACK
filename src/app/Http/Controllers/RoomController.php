@@ -76,8 +76,8 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        $room->photos()->destroy();
-        $room->destroy();
+        $room->photos->delete();
+        $room->delete();
         return response()->json([
             'message' => 'Room deleted successfully',
         ], 200);
