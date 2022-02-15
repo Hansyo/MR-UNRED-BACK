@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -42,15 +43,18 @@ class ReserveController extends Controller
                     'conflictings' => $result
                 ], 409);
             }
-            return Reserve::create([
+            $reserve = Reserve::create([
                 'guest_name' => $request->guest_name,
                 'start_date_time' => new Carbon($request->start_date_time),
                 'end_date_time' => new Carbon($request->end_date_time),
                 'purpose' => $request->purpose,
                 'guest_detail' => $request->guest_detail,
                 'room_id' => $request->room_id,
-        ]);
-    });
+            ]);
+            $room = Room::find($request->room_id);
+            $room->reserves()->save($reserve);
+            return $reserve;
+        });
         return $result;
     }
 

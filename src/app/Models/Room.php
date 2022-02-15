@@ -18,6 +18,11 @@ class Room extends Model
         return $this->hasMany(Photo::class);
     }
 
+    public function reserves()
+    {
+        return $this->hasMany(Reserve::class);
+    }
+
     public function toArray()
     {
         return [

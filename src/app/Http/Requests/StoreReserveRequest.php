@@ -40,7 +40,7 @@ class StoreReserveRequest extends FormRequest
             'end_date_time'   => ['bail', 'required', $isValidDate, 'after:start_date_time'],
             'purpose'         => ['required', 'string',],
             'guest_detail'    => ['string',],
-            'room_id'         => ['required', 'integer', 'between:1,6'],
+            'room_id'         => ['required', 'integer', 'exists:rooms,id'],
         ];
     }
 }

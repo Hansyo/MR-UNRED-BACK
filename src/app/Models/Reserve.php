@@ -25,4 +25,9 @@ class Reserve extends Model
             $q->where('start_date_time', '<', $start)->where('end_date_time', '>', $end);
         });
     }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
 }
