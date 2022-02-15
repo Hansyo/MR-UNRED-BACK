@@ -51,8 +51,6 @@ class ReserveController extends Controller
                 'guest_detail' => $request->guest_detail,
                 'room_id' => $request->room_id,
             ]);
-            $room = Room::find($request->room_id);
-            $room->reserves()->save($reserve);
             return $reserve;
         });
         return $result;
