@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('reserve', ReserveController::class);
+
+Route::apiResource('rooms', RoomController::class);
