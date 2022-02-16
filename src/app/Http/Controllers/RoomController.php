@@ -70,9 +70,7 @@ class RoomController extends Controller
     {
         return DB::transaction(function () use ($room) {
             $room->delete();
-            return response()->json([
-                'message' => 'Room deleted successfully',
-            ], 200);
+            return response()->json('', 204);
         });
 
     }
