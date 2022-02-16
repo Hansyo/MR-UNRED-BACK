@@ -52,12 +52,12 @@ class RoomController extends Controller
      */
     public function update(StoreRoomRequest $request, Room $room)
     {
-        DB::transaction(function () use ($request, $room) {
+        return DB::transaction(function () use ($request, $room) {
             $room->name = $request->name;
             $room->detail = $request->detail;
             $room->save();
+            return $room;
         });
-        return $room;
     }
 
     /**
