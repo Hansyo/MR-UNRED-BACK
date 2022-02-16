@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoomRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
@@ -26,8 +27,9 @@ class RoomController extends Controller
      */
     public function store(StoreRoomRequest $request)
     {
-        $room = Room::create(['name' => $request->name, 'detail' => $request->detail]);
-        return $room;
+        return DB::transaction(function () use ($request) {
+            return Room::create(['name' => $request->name, 'detail' => $request->detail]);
+        });
     }
 
     /**
@@ -50,9 +52,11 @@ class RoomController extends Controller
      */
     public function update(StoreRoomRequest $request, Room $room)
     {
-        $room->name = $request->name;
-        $room->detail = $request->detail;
-        $room->save();
+        DB::transaction(function () use ($request, $room) {
+            $room->name = $request->name;
+            $room->detail = $request->detail;
+            $room->save();
+        });
         return $room;
     }
 
@@ -64,9 +68,12 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        $room->delete();
-        return response()->json([
-            'message' => 'Room deleted successfully',
-        ], 200);
+        return DB::transaction(function () use ($room) {
+            $room->delete();
+            return response()->json([
+                'message' => 'Room deleted successfully',
+            ], 200);
+        });
+
     }
 }
