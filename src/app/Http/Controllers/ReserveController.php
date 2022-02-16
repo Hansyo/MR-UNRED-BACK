@@ -8,10 +8,10 @@ use Carbon\Carbon;
 
 use App\Models\Reserve;
 use App\Models\Repitation;
+use App\Models\Room;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
 use App\Http\Requests\DestroyReserveRequest;
-
 
 class ReserveController extends Controller
 {

@@ -17,3 +17,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::apiResource('reserve', ReserveController::class);
 Route::apiResource('repitations', RepitationController::class);
+Route::apiResource('rooms', RoomController::class);

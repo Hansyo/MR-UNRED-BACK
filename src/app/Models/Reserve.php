@@ -65,4 +65,9 @@ class Reserve extends Model
     {
         return $this->belongsTo(Repitation::class);
     }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
 }
