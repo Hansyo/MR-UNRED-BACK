@@ -23,7 +23,7 @@ class Reserve extends Model
             "end_date_time" => $this->end_date_time->toIsoString(),
             "purpose" => $this->purpose,
             "guest_detail" => $this->guest_detail,
-            "room_id" => $this->room_id,
+            "room" => $this->room,
             "repitation_id" => $this->repitation_id,
             "created_at" => $this->created_at->toIsoString(),
             "updated_at" => $this->updated_at->toIsoString(),
