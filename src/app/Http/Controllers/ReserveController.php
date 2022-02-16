@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DestroyReserveRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Log\Logger;
+use Carbon\Carbon;
+
 use App\Models\Reserve;
+use App\Models\Repitation;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\DestroyReserveRequest;
 
-use App\Models\Repitation;
-use Illuminate\Log\Logger;
 
 class ReserveController extends Controller
 {
