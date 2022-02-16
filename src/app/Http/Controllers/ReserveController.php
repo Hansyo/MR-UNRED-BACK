@@ -161,8 +161,48 @@ class ReserveController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Reserve $reserve)
     {
+        $result = DB::transaction(function () use ($request, $reserve) {
+            $isall = $request->isall;
+            $now = Carbon::now(); // 現在時刻
+            $repitation = $reserve->repitation();
+            if ($repitation == null || $isall == 0){ //繰り返しなし
+                if ($now < $reserve->input('start_at_date')){  /*今日より前だったら*/
+                    return response()->json([
+                        'message' => 'ID not found',
+                    ], 404);
+                }
+                $result = $reserve->delete();
+                if ($repitation != null && $repitation->reserves()->count() == 0){  //reserveが0
+                    $repitation->delete();
+                }
+                if ($result) {
+                    return response()->json([
+                        'message' => 'Reserve deleted successfully',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'ID not found',
+                    ], 404);
+                }
+            } else { //繰り返しあり
+                $reserves = $reserve->repitation()->reserves();
+                $reserves->foreach(function($res) use ($now){
+                    if ($now > $res->input('start_at_date')){ //今日より後ろだったら
+                        $res->delete();
+                    }
+                });
+                if ($repitation->reserves()->count() == 0){  //reserveが0
+                    $repitation->delete();
+                }
+                return response()->json([
+                    'message' => 'Reserve deleted successfully',
+                ], 200);
+            } 
+        });
+        return $result;
+        /*
         $result = Reserve::where('id', $id)->delete();
         if ($result) {
             return response()->json([
@@ -172,7 +212,7 @@ class ReserveController extends Controller
             return response()->json([
                 'message' => 'ID not found',
             ], 404);
-        }
+        }*/
         //
     }
 }
