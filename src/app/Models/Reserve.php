@@ -14,6 +14,21 @@ class Reserve extends Model
         'end_date_time',
     ];
 
+    public function toArray()
+    {
+        return [
+            "id" => $this->id,
+            "guest_name" => $this->guest_name,
+            "start_date_time" => $this->start_date_time->toIsoString(),
+            "end_date_time" => $this->end_date_time->toIsoString(),
+            "purpose" => $this->purpose,
+            "guest_detail" => $this->guest_detail,
+            "room_id" => $this->room_id,
+            "created_at" => $this->created_at->toIsoString(),
+            "updated_at" => $this->updated_at->toIsoString(),
+        ];
+    }
+
     public function scopeWhereHasReservation($query, $start, $end)
     {
 
