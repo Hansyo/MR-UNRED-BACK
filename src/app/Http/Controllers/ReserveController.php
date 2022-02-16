@@ -186,7 +186,7 @@ class ReserveController extends Controller
             $del_repitations->each(function ($res) {
                 $res->delete();
             });
-            return response()->json();
+            return response()->json('', 204);
         });
         // 2. 同期した予約が0なら、同期レコードも削除
         $repitation = Repitation::find($repitation->id); // 自身の情報を更新する必要がある
