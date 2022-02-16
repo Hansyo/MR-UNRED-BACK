@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyReserveRequest;
 use Illuminate\Http\Request;
 use App\Models\Reserve;
 use App\Http\Requests\GetIndexReserveRequest;
@@ -158,61 +159,41 @@ class ReserveController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Http\Requests\DestroyReserveRequest $request
+     * @param  \App\Http\Models\Reserve $reserve
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, Reserve $reserve)
+    public function destroy(DestroyReserveRequest $request, Reserve $reserve)
     {
-        $result = DB::transaction(function () use ($request, $reserve) {
-            $isall = $request->isall;
-            $now = Carbon::now(); // 現在時刻
-            $repitation = $reserve->repitation();
-            if ($repitation == null || $isall == 0){ //繰り返しなし
-                if ($now < $reserve->input('start_at_date')){  /*今日より前だったら*/
-                    return response()->json([
-                        'message' => 'ID not found',
-                    ], 404);
-                }
-                $result = $reserve->delete();
-                if ($repitation != null && $repitation->reserves()->count() == 0){  //reserveが0
-                    $repitation->delete();
-                }
-                if ($result) {
-                    return response()->json([
-                        'message' => 'Reserve deleted successfully',
-                    ], 200);
-                } else {
-                    return response()->json([
-                        'message' => 'ID not found',
-                    ], 404);
-                }
-            } else { //繰り返しあり
-                $reserves = $reserve->repitation()->reserves();
-                $reserves->foreach(function($res) use ($now){
-                    if ($now > $res->input('start_at_date')){ //今日より後ろだったら
-                        $res->delete();
-                    }
+        $repitation = $reserve->repitation;
+        $result = DB::transaction(function () use ($request, $reserve, $repitation) {
+            $now = Carbon::now();
+            $del_repitations = collect();
+            // 削除可能な予約を抽出
+            if ($repitation == null || $request->is_all == false) {
+                if ($now < $reserve->start_date_time) $del_repitations->push($reserve);
+            } else {
+                $repitation->reserves->each(function ($res) use ($now, $del_repitations) {
+                    if ($now < $res->start_date_time) $del_repitations->push($res);
                 });
-                if ($repitation->reserves()->count() == 0){  //reserveが0
-                    $repitation->delete();
-                }
-                return response()->json([
-                    'message' => 'Reserve deleted successfully',
-                ], 200);
-            } 
+            }
+
+            // 共通処理
+            // 0. 削除する予約がなかったら、削除できないを返す
+            // 1. 削除リストに登録されている予約を全て削除
+            if ($del_repitations->isEmpty()) return response()->json(['message' => '削除可能な予約はありません。'], 404);
+            $del_repitations->each(function ($res) {
+                $res->delete();
+            });
+            return response()->json();
+        });
+        // 2. 同期した予約が0なら、同期レコードも削除
+        $repitation = Repitation::find($repitation->id); // 自身の情報を更新する必要がある
+        DB::transaction(function () use ($repitation) {
+            Logger("Reserves", [$repitation->reserves]);
+            if ($repitation != null && $repitation->reserves->isEmpty()) $repitation->delete();
         });
         return $result;
-        /*
-        $result = Reserve::where('id', $id)->delete();
-        if ($result) {
-            return response()->json([
-                'message' => 'Reserve deleted successfully',
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'ID not found',
-            ], 404);
-        }*/
-        //
+
     }
 }
