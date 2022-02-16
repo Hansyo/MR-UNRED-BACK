@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRoomRequest;
-use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\Room;
+use App\Http\Requests\StoreRoomRequest;
 
 class RoomController extends Controller
 {
