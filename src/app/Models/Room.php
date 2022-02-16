@@ -13,11 +13,6 @@ class Room extends Model
         'end_date_time',
     ];
 
-    public function photos()
-    {
-        return $this->hasMany(Photo::class);
-    }
-
     public function reserves()
     {
         return $this->hasMany(Reserve::class);
@@ -29,7 +24,6 @@ class Room extends Model
             "id" => $this->id,
             "name" => $this->name,
             "detail" => $this->detail,
-            "photos" => $this->photos()->get(),
             "created_at" => $this->created_at->toIsoString(),
             "updated_at" => $this->updated_at->toIsoString(),
         ];

@@ -27,12 +27,6 @@ class RoomController extends Controller
     public function store(StoreRoomRequest $request)
     {
         $room = Room::create(['name' => $request->name, 'detail' => $request->detail]);
-        if($request->has('files')) {
-            foreach ($request->file('files') as $index => $e) {
-                $path = $e->store('public/images');
-                $room->photos()->create(['path' => $path]);
-            }
-        }
         return $room;
     }
 
@@ -59,12 +53,6 @@ class RoomController extends Controller
         $room->name = $request->name;
         $room->detail = $request->detail;
         $room->save();
-        if($request->file('newfiles')->isValid()) {
-            foreach ($request->file('newfiles') as $index => $e) {
-                $path = $e->store('public/images');
-                $room->photos()->create(['path' => $path]);
-            }
-        }
         return $room;
     }
 
@@ -76,7 +64,6 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
-        $room->photos->delete();
         $room->delete();
         return response()->json([
             'message' => 'Room deleted successfully',

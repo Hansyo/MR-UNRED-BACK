@@ -26,8 +26,6 @@ class StoreRoomRequest extends FormRequest
         return [
             'name'   => ['required', 'string'],
             'detail' => ['required', 'string'],
-            'files.*.photo' => ['image'],
-            'newfiles.*.photo' => ['image'],
         ];
     }
 }
