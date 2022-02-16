@@ -35,8 +35,8 @@ class GetIndexReserveRequest extends FormRequest
         };
 
         return [
-            'start_date_time' => ['bail', 'required', $isValidDate, 'before:end_date_time'],
-            'end_date_time'   => ['bail', 'required', $isValidDate, 'after:start_date_time'],
+            'start_date_time' => ['bail', 'required_with_all:start_date_time', $isValidDate, 'before:end_date_time'],
+            'end_date_time'   => ['bail', 'required_with_all:end_date_time',   $isValidDate, 'after:start_date_time'],
             'room_id'         => ['integer', 'between:1,6'],
         ];
     }

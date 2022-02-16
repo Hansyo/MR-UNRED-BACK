@@ -22,10 +22,10 @@ class ReserveController extends Controller
      */
     public function index(GetIndexReserveRequest $request)
     {
-        $start_at = $request->query('start_date_time');
-        $end_at = $request->query('end_date_time');
-        $result = Reserve::whereHasReservation($start_at, $end_at);
-        if ($request->filled('room_id')) $result = $result->where('room_id', '=', $request->query('room_id'));
+        $result = Reserve::query();
+        if ($request->filled('room_id')) $result = $result->roomId($request->query('room_id'));
+        if ($request->has(['start_date_time', 'end_date_time']))
+            $result = $result->whereHasReservation($request->query('start_date_time'), $request->query('end_date_time'));
         return $result->get();
     }
 
