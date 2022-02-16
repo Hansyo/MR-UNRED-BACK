@@ -15,9 +15,7 @@ class RepitationController extends Controller
      */
     public function index()
     {
-        return response()->json([
-            "message" => "Page not found."
-        ], 404);
+        return response()->json(["message" => "Page not found."], 404);
     }
 
     /**
@@ -28,9 +26,7 @@ class RepitationController extends Controller
      */
     public function store(Request $request)
     {
-        return response()->json([
-            "message" => "Page not found.",
-        ], 404);
+        return response()->json(["message" => "Page not found."], 404);
     }
 
     /**
@@ -42,11 +38,7 @@ class RepitationController extends Controller
     public function show(Request $request, $id)
     {
         $repitations = Repitation::find($id);
-        if($repitations != null) {
-            return $repitations->reserves()->get();
-        } else {
-            return response()->json(["message" => "ID not found.",], 404);
-        }
+        return ($repitations != null) ? $repitations->reserves : response()->json(["message" => "ID not found.",], 404);
     }
 
     /**
@@ -58,9 +50,7 @@ class RepitationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json([
-            "message" => "Page not found."
-        ], 404);
+        return response()->json(["message" => "Page not found."], 404);
     }
 
     /**
@@ -71,8 +61,6 @@ class RepitationController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json([
-            "message" => "Page not found."
-        ], 404);
+        return response()->json(["message" => "Page not found."], 404);
     }
 }

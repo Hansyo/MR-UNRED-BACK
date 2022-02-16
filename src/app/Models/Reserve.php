@@ -14,15 +14,14 @@ class Reserve extends Model
         'end_date_time',
     ];
 
-    public function scopeWhereHasReservation($query, $start, $end){
+    public function scopeWhereHasReservation($query, $start, $end)
+    {
 
-        $query->where(function($q) use($start, $end) {
+        $query->where(function ($q) use ($start, $end) {
             $q->where('start_date_time', '>=', $start)->where('start_date_time', '<', $end);
-        })
-        ->orWhere(function($q) use($start, $end){
+        })->orWhere(function ($q) use ($start, $end) {
             $q->where('end_date_time', '>', $start)->where('end_date_time', '<=', $end);
-        })
-        ->orWhere(function($q) use ($start, $end){
+        })->orWhere(function ($q) use ($start, $end) {
             $q->where('start_date_time', '<', $start)->where('end_date_time', '>', $end);
         });
     }
@@ -46,7 +45,8 @@ class Reserve extends Model
             return $query->whereRaw("NOT (DAYOFWEEK(start_date_time) <= DAYOFWEEK(end_date_time) AND ${ew} < DAYOFWEEK(start_date_time) AND DAYOFWEEK(end_date_time) < ${sw})");
     }
 
-    public function repitation() {
+    public function repitation()
+    {
         return $this->belongsTo(Repitation::class);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Log\Logger;
 use Carbon\Carbon;
 
 use App\Models\Reserve;
@@ -60,7 +59,6 @@ class ReserveController extends Controller
 
             switch ($request->input('repitation.type')) {
                 case 0: // 繰り返しなし
-                    Logger("NONE", ["NONE" => $request]);
                     $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $end_at)->get();
                     if ($bookings->isEmpty()) // ダブりなしなら作成してreturn
                         return Reserve::create([
@@ -191,7 +189,6 @@ class ReserveController extends Controller
         // 2. 同期した予約が0なら、同期レコードも削除
         $repitation = Repitation::find($repitation->id); // 自身の情報を更新する必要がある
         DB::transaction(function () use ($repitation) {
-            Logger("Reserves", [$repitation->reserves]);
             if ($repitation != null && $repitation->reserves->isEmpty()) $repitation->delete();
         });
         return $result;
