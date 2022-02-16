@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 class Reserve extends Model
 {
     protected $table = 'reserves';
-    protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at', 'repitation_id'];
     protected $dates = [
         'start_date_time',
         'end_date_time',
@@ -24,6 +24,7 @@ class Reserve extends Model
             "purpose" => $this->purpose,
             "guest_detail" => $this->guest_detail,
             "room_id" => $this->room_id,
+            "repitation_id" => $this->repitation_id,
             "created_at" => $this->created_at->toIsoString(),
             "updated_at" => $this->updated_at->toIsoString(),
         ];
