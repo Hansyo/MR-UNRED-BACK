@@ -133,17 +133,9 @@ class ReserveController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Reserve $reserve)
     {
-        $result = Reserve::find($id);
-        if ($result) {
-            return $result;
-        } else {
-            return response()->json([
-                'message' => 'ID not found',
-            ], 404);
-        }
-        //
+        return $reserve;
     }
 
     /**
