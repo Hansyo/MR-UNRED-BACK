@@ -67,6 +67,7 @@ class StoreReserveRequest extends FormRequest
         };
 
         return [
+            'reserver_name'   => ['required', 'string',],
             'guest_name'      => ['string',],
             'start_date_time' => ['bail', 'required', $isValidDate, 'after:now', 'before:end_date_time', ],
             'end_date_time'   => ['bail', 'required', $isValidDate, 'after:start_date_time',],

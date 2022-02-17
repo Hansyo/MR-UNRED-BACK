@@ -48,6 +48,7 @@ class ReserveController extends Controller
             $start_at = $request->input('start_date_time');
             $end_at = $request->input('end_date_time');
             $room_id = $request->input('room_id');
+            $reserver_name = $request->input('reserver_name');
             $guest_name = $request->input('guest_name');
             $purpose = $request->input('purpose');
             $guest_detail = $request->input('guest_detail');
@@ -62,6 +63,7 @@ class ReserveController extends Controller
                     $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $end_at)->get();
                     if ($bookings->isEmpty()) // ダブりなしなら作成してreturn
                         return Reserve::create([
+                            'reserver_name' => $reserver_name,
                             'guest_name' => $guest_name,
                             'start_date_time' => $s_at_c,
                             'end_date_time' => $e_at_c,
@@ -108,8 +110,9 @@ class ReserveController extends Controller
                 ], 409);
             } else { // Not Conflicting.
                 $repitation = Repitation::create();
-                $days->eachSpread(function ($start, $end) use ($guest_name, $purpose, $guest_detail, $room_id, $repitation) {
+                $days->eachSpread(function ($start, $end) use ($reserver_name, $guest_name, $purpose, $guest_detail, $room_id, $repitation) {
                     $repitation->reserves()->create([
+                        'reserver_name' => $reserver_name,
                         'guest_name' => $guest_name,
                         'start_date_time' => $start,
                         'end_date_time' => $end,

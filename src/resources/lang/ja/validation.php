@@ -119,6 +119,7 @@ return [
     'attributes' => [
         'start_date_time' => '開始時間',
         'end_date_time' => '終了時間',
+        'reserver_name' => '予約者名',
         'guest_name' => '利用者名',
         'purpose' => '目的',
         'room_id' => '会議室ID',

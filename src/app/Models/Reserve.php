@@ -18,6 +18,7 @@ class Reserve extends Model
     {
         return [
             "id" => $this->id,
+            "reserver_name" => $this->reserver_name,
             "guest_name" => $this->guest_name,
             "start_date_time" => $this->start_date_time->toIsoString(),
             "end_date_time" => $this->end_date_time->toIsoString(),
