@@ -105,7 +105,7 @@ class ReserveController extends Controller
 
             if ($bookings->isNotEmpty()) { // Conflicting.
                 return response()->json([
-                    'message' => 'Reservation is conflicting',
+                    'message' => '指定された時間には予約がすでにあります。',
                     'conflictings' => $bookings,
                 ], 409);
             } else { // Not Conflicting.
