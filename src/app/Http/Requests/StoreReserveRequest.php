@@ -35,35 +35,35 @@ class StoreReserveRequest extends FormRequest
             $end = new Carbon($this->input('end_date_time'));
             switch ($this->input('repitation.type')) {
                 case 1:
-                    if (!$end->between($start, $start->copy()->addDay())) $fail('start_date_time and end_date_time must be scheduled within 24 hours.');
+                    if (!$end->between($start, $start->copy()->addDay())) $fail('開始日時から終了日時は24時間以内である必要があります。');
                 case 2:
-                    if (!$end->between($start, $start->copy()->addWeek())) $fail('start_date_time and end_date_time must be scheduled within a week.');
+                    if (!$end->between($start, $start->copy()->addWeek())) $fail('開始日時から終了日時は一週間以内である必要があります。');
             }
         };
 
         $repitation_method_both = function ($attr, $val, $fail) {
             if ($this->input('repitation.type') != 0) {
                 if ($this->has('repitation.num') && $this->has('repitation.finish_at'))
-                    $fail('Only one of repitation.num and repitation.finish_at can be specified, not both.');
+                    $fail('繰り返し回数か終了日はどちらかのみ指定することができます。');
             }
         };
 
         $repitation_method_nothing = function ($attr, $val, $fail) {
             if ($this->input('repitation.type') != 0) {
                 if ((!$this->filled('repitation.num')) && (!$this->filled('repitation.finish_at')))
-                    $fail('Either repitation.num or repitation.finish_at must be specified.');
+                    $fail('繰り返し回数か終了日のどちらかを指定する必要があります。');
             }
         };
 
         $repitation_finish_date = function ($attr, $val, $fail) {
-            if (!(new Carbon($this->input('end_date_time')))->lte((new Carbon($val))->endOfDay())) $fail('Reservations must be made at least once.');
+            if (!(new Carbon($this->input('end_date_time')))->lte((new Carbon($val))->endOfDay())) $fail('少なくとも1回は予約をできる必要があります。');
         };
 
         $isValidDate = function ($attr, $val, $fail) {
             if (!preg_match('/^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-4]):[0-5][0-9]:[0-5][0-9].\d{3}Z$/', $val, $matches))
-                $fail('Date format is wrong.');
+                $fail('日付の形式が間違っています。');
             else if (!checkdate(intval($matches[2]), intval($matches[3]), intval($matches[1]))) // month, day, year
-                $fail('Date does not exit.');
+                $fail("$attr は存在しません。");
         };
 
         return [
