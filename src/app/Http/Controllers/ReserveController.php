@@ -50,8 +50,8 @@ class ReserveController extends Controller
             $room_id = $request->input('room_id');
             $reserver_name = $request->input('reserver_name');
             $guest_name = $request->input('guest_name');
-            $purpose = $request->input('purpose');
-            $guest_detail = $request->input('guest_detail');
+            $purpose = $request->input('purpose') ?? "";
+            $guest_detail = $request->input('guest_detail') ?? "";
 
             $s_at_c = new Carbon($start_at);
             $e_at_c = new Carbon($end_at);

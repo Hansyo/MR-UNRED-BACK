@@ -68,11 +68,11 @@ class StoreReserveRequest extends FormRequest
 
         return [
             'reserver_name'   => ['required', 'string',],
-            'guest_name'      => ['string',],
+            'guest_name'      => ['required', 'string',],
             'start_date_time' => ['bail', 'required', $isValidDate, 'after:now', 'before:end_date_time', ],
             'end_date_time'   => ['bail', 'required', $isValidDate, 'after:start_date_time',],
-            'purpose'         => ['required', 'string',],
-            'guest_detail'    => ['string',],
+            'purpose'         => ['nullable', 'string', ],
+            'guest_detail'    => ['nullable', 'string',],
             'room_id'         => ['required', 'integer', 'exists:rooms,id'],
             'repitation.type' => ['required', 'integer', 'between:0,2', $repitation_duration, $repitation_method_both, $repitation_method_nothing,],
             'repitation.num'  => ['integer', 'min:1',],
