@@ -18,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('reserve', ReserveController::class);
 Route::apiResource('repitations', RepitationController::class);
 Route::apiResource('rooms', RoomController::class);
+
+Route::fallback(function(){
+    return response()->json(['message' => 'Not Found'], 404);
+});
