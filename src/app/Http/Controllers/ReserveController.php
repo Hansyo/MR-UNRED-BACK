@@ -182,10 +182,12 @@ class ReserveController extends Controller
             return response()->json('', 204);
         });
         // 2. 同期した予約が0なら、同期レコードも削除
-        $repitation = Repitation::find($repitation->id); // 自身の情報を更新する必要がある
-        DB::transaction(function () use ($repitation) {
-            if ($repitation != null && $repitation->reserves->isEmpty()) $repitation->delete();
-        });
+        if ($repitation != null) {
+            $repitation = Repitation::find($repitation->id); // 自身の情報を更新する必要がある
+            DB::transaction(function () use ($repitation) {
+                if ($repitation != null && $repitation->reserves->isEmpty()) $repitation->delete();
+            });
+        }
         return $result;
 
     }
