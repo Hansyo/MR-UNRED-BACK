@@ -79,27 +79,29 @@ class ReserveController extends Controller
                     /* JSTの0:00 ~ 9:00 までに終了時間が入った場合、追加で一日予約を取られてしまう。対抗策として、終了日を1日前倒しする。もっとスマートな方法があるかも。
                        週毎では、同様の問題が起こらない。なぜなら期間が1週間と長く、1日程度の差を吸収してしまうため。1週間先を指定されることは想定しない。 */
                     if ($e_at_c->gte($e_at_c->copy()->setTime(15, 00, 00))) $f_at_c->subDay(1);
+                    // 範囲を絞っておく
+                    $candidate = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString());
                     // 予定を登録する日を予め計算しておく。
                     while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
                         $days->push([$s_at_c->copy(), $e_at_c->copy()]);
+                        $bookings->push($candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get());
                         $s_at_c->addDay(1);
                         $e_at_c->addDay(1);
                     }
-                    // 衝突確認
-                    $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->get();
                     break;
 
                 case 2: // 毎週
                     $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addWeek($request->input('repitation.num') - 1))->endOfDay();
                     Logger("f_at_c", ["f_at_c" => $f_at_c]);
+                    // 範囲を絞っておく
+                    $candidate = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString());
                     // 予定を登録する日を予め計算しておく。
                     while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
                         $days->push([$s_at_c->copy(), $e_at_c->copy()]);
+                        $bookings->push($candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get());
                         $s_at_c->addWeek(1);
                         $e_at_c->addWeek(1);
                     }
-                    // 衝突確認
-                    $bookings = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->dayOfWeeks($start_at, $end_at)->whereHasReservation($start_at, $end_at)->get();
                     break;
             }
 
