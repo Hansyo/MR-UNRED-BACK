@@ -75,8 +75,8 @@ class StoreReserveRequest extends FormRequest
             'guest_detail'    => ['nullable', 'string',],
             'room_id'         => ['required', 'integer', 'exists:rooms,id'],
             'repitation.type' => ['required', 'integer', 'between:0,2', $repitation_duration, $repitation_method_both, $repitation_method_nothing,],
-            'repitation.num'  => ['integer', 'min:1',],
-            'repitation.finish_at' => ['date_format:Y-m-d', $repitation_finish_date,],
+            'repitation.num'  => ['integer', 'min:1', 'nullable',],
+            'repitation.finish_at' => ['date_format:Y-m-d', $repitation_finish_date, 'nullable',],
         ];
     }
 
