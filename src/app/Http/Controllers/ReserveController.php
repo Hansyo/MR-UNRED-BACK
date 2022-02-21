@@ -12,6 +12,7 @@ use App\Models\Room;
 use App\Http\Requests\GetIndexReserveRequest;
 use App\Http\Requests\StoreReserveRequest;
 use App\Http\Requests\DestroyReserveRequest;
+use Monolog\Logger;
 
 class ReserveController extends Controller
 {
@@ -84,7 +85,9 @@ class ReserveController extends Controller
                     // 予定を登録する日を予め計算しておく。
                     while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
                         $days->push([$s_at_c->copy(), $e_at_c->copy()]);
-                        $bookings->push($candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get());
+                        // 時間内にかぶりがあるか確認
+                        $tmp = $candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get();
+                        if ($tmp->isNotEmpty()) $bookings = $bookings->union($tmp);
                         $s_at_c->addDay(1);
                         $e_at_c->addDay(1);
                     }
@@ -94,11 +97,13 @@ class ReserveController extends Controller
                     $f_at_c = (($request->has('repitation.finish_at')) ? (new Carbon($request->input('repitation.finish_at'))) : (new Carbon($end_at))->addWeek($request->input('repitation.num') - 1))->endOfDay();
                     Logger("f_at_c", ["f_at_c" => $f_at_c]);
                     // 範囲を絞っておく
-                    $candidate = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString());
+                    $candidate = Reserve::roomId($room_id)->whereHasReservation($start_at, $f_at_c->toISOString())->dayOfWeeks($start_at, $end_at);
                     // 予定を登録する日を予め計算しておく。
                     while ($f_at_c->isAfter($e_at_c) || $f_at_c->isSameDay($e_at_c)) {
                         $days->push([$s_at_c->copy(), $e_at_c->copy()]);
-                        $bookings->push($candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get());
+                        // 時間内にかぶりがあるか確認
+                        $tmp = $candidate->whereHasReservation($s_at_c->toISOString(), $e_at_c->toISOString())->get();
+                        if ($tmp->isNotEmpty()) $bookings = $bookings->union($tmp);
                         $s_at_c->addWeek(1);
                         $e_at_c->addWeek(1);
                     }
@@ -191,6 +196,5 @@ class ReserveController extends Controller
             });
         }
         return $result;
-
     }
 }
