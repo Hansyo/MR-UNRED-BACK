@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-class StoreRoomRequest extends ApiRequest
+class UpdateRoomRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class StoreRoomRequest extends ApiRequest
     public function rules()
     {
         return [
-            'name'   => ['required', 'string', 'unique:rooms'],
+            'name'   => ['required', 'string'],
             'detail' => ['required', 'string'],
         ];
     }

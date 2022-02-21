@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class GetIndexReserveRequest extends FormRequest
+class GetIndexReserveRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -39,9 +39,5 @@ class GetIndexReserveRequest extends FormRequest
             'end_date_time'   => ['bail', 'required_with_all:end_date_time',   $isValidDate, 'after:start_date_time'],
             'room_id'         => ['integer', 'exists:rooms,id'],
         ];
-    }
-
-    protected function failedValidation(Validator $validator) {
-        throw new HttpResponseException(response()->json(["message" =>"The given data was invalid.", "errors" => $validator->errors()], 422));
     }
 }

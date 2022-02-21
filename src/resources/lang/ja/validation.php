@@ -126,7 +126,7 @@ return [
         'guest_detail' => '利用者情報',
         'repitation.num' => '繰り返し回数',
         'name' => '会議室名',
-        'deatail' => '詳細情報',
+        'detail' => '詳細情報',
     ],
 
 ];

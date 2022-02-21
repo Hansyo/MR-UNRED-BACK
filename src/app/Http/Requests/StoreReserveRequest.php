@@ -2,14 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
 use Carbon\Carbon;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 
-class StoreReserveRequest extends FormRequest
+class StoreReserveRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -78,10 +74,5 @@ class StoreReserveRequest extends FormRequest
             'repitation.num'  => ['integer', 'min:1', 'nullable',],
             'repitation.finish_at' => ['date_format:Y-m-d', $repitation_finish_date, 'nullable',],
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json(["message" => "The given data was invalid.", "errors" => $validator->errors()], 422));
     }
 }

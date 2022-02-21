@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Room;
 use App\Http\Requests\StoreRoomRequest;
+use App\Http\Requests\UpdateRoomRequest;
 
 class RoomController extends Controller
 {
@@ -51,7 +52,7 @@ class RoomController extends Controller
      * @param  \App\Room  $room
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreRoomRequest $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room)
     {
         return DB::transaction(function () use ($request, $room) {
             $room->name = $request->name;
