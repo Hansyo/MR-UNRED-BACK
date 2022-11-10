@@ -4,8 +4,8 @@ MR-UNRED-BACKは会議室予約システムのバックエンドサーバーを�
 フロントエンドには[こちら](https://github.com/Hansyo/MR-UNRED-FRONT)をご利用ください。
 
 ## 提供中API
-[会議室予約API]()  
-[会議室情報API]()  
+[会議室予約API](documents/reserve-api.md)  
+[会議室情報API](documents/room-api.md)  
 
 ## 環境構築
 1. [Sailを使ってコンテナを起動](#Sailを使ってコンテナを起動-1)
